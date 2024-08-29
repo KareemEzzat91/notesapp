@@ -4,9 +4,12 @@ A new Flutter project.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
+The "Notes App" is a Flutter-based mobile application designed for creating and managing notes with ease.
+•	Key Features:
+o	Note Management: Create, edit, and delete notes with a user-friendly interface.
+o	State Management: Uses Cupit for smooth state handling.
+o	API Integration: Handles data synchronization with Dio, tested using Postman.
+o	Local Storage: Ensures offline access to notes with secure sync capabilities.
 
 - [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
 - [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)

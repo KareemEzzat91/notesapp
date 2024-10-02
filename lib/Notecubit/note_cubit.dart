@@ -36,7 +36,15 @@ class NoteCubit extends Cubit<NoteState> {
 
 
  }
-void updateNote(TextEditingController _textFieldController,BuildContext Context,int index){
+  void saveText (TextEditingController _textFieldController,String item){
+    NoteHiveHelper.saveText( _textFieldController, item);
+    emit(updateNoteState());
+  }
+  void RemoveText (TextEditingController _textFieldController,String item){
+    NoteHiveHelper.RemoveText( _textFieldController, item);
+    emit(updateNoteState());
+  }
+ void updateNote(TextEditingController _textFieldController,BuildContext Context,int index){
   if (_textFieldController.text.isNotEmpty) {
     NoteHiveHelper.updateNote(index: index, text: _textFieldController.text);
   }
@@ -46,6 +54,7 @@ void updateNote(TextEditingController _textFieldController,BuildContext Context,
   Navigator.pop(Context);
   emit(updateNoteState());
 }
+
  void deleteallNotes(){
     NoteHiveHelper.removeAllNote();
     emit(removeAllNoteState());
@@ -53,9 +62,27 @@ void updateNote(TextEditingController _textFieldController,BuildContext Context,
 void getNotes ()async{
     emit(LoadingState());
 
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(Duration(seconds: 1));
    try{
      NoteHiveHelper.getNotes();
+     Get.snackbar(
+       "GeeksforGeeks",
+       "Hello everyone",
+       icon: Icon(Icons.person, color: Colors.white),
+       snackPosition: SnackPosition.BOTTOM,
+     );
+     emit(SuccsessState());
+   }
+   catch(e){
+     Get.snackbar("Error", "Please Check Your Network ");
+     emit(FaliuerState(e.toString()));
+      }
+}
+Future<void> getTexts ()async{
+    emit(LoadingState());
+
+   try{
+     NoteHiveHelper.gettext();
      Get.snackbar(
        "GeeksforGeeks",
        "Hello everyone",

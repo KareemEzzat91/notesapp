@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get/get.dart';
 import 'package:notesapp/hive_helper.dart';
+import 'package:notesapp/textpage/Textpage.dart';
 
 import '../Notecubit/note_cubit.dart';
 
@@ -25,27 +26,30 @@ class Mainscreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final bloc = context.read<NoteCubit>();
+    print(1);
     double width = MediaQuery.of(context).size.width;
     double hight = MediaQuery.of(context).size.height;
     return  BlocBuilder<NoteCubit, NoteState>(
       builder: (BuildContext context, NoteState state) {
         if (state is LoadingState) {
-          return Center(
+          print("LoadingState");
+          return const Center(
               child: CircularProgressIndicator(
             color: Colors.red,
             backgroundColor: Colors.white,
           ));
         }
         if (state is FaliuerState) {
-          return Center(
+          print("FaliuerState");
+          return const Center(
               child: Text(
             "Error ",
             style: TextStyle(
                 color: Colors.red, fontSize: 50, fontWeight: FontWeight.bold),
           ));
         } else {
+          print(2);
           return Scaffold(
-
             appBar: buildAppBar(context),
             floatingActionButton: buildFloatingActionButton(context),
             body: ListView.builder(
@@ -78,12 +82,41 @@ class Mainscreen extends StatelessWidget {
                           );
                         });
                   },
-                  child: Icon(
+                  child: const Icon(
                     Icons.delete_forever,
                     color: Colors.white,
                     size: 45,
                   ),
                 ),
+                Positioned(right: 5, child: IconButton(onPressed: () {
+                  showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: Text("you want to update " +
+                              NoteHiveHelper.myNotes[index] +
+                              "?"),
+                          content: TextField(
+                            controller: _textFieldController,
+                            decoration: InputDecoration(hintText: "Your New Note Name"),
+                          ),
+                          actions: <Widget>[
+                            TextButton(
+                              child: Text('CANCEL'),
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                            TextButton(
+                              child: Text('OK'),
+                              onPressed: () {
+                                bloc.updateNote (_textFieldController,context,index);
+                              },
+                            ),
+                          ],
+                        );
+                      });
+                }, icon: Icon(Icons.change_circle_outlined,color: Colors.white,size: 40,)))
               ]),
             ),
           );
@@ -124,7 +157,7 @@ class Mainscreen extends StatelessWidget {
           },
         );
       },
-      child: Icon(
+      child: const Icon(
         Icons.add,
         color: Colors.white,
         size: 40,
@@ -138,31 +171,12 @@ class Mainscreen extends StatelessWidget {
       padding: const EdgeInsets.all(10.0),
       child: GestureDetector(
         onTap: () {
-          showDialog(
-              context: context,
-              builder: (context) {
-                return AlertDialog(
-                  title: Text("you want to update " +
-                      NoteHiveHelper.myNotes[index] +
-                      "?"),
-                  content: TextField(
-                    controller: _textFieldController,
-                    decoration: InputDecoration(hintText: "Your New Note Name"),
-                  ),
-                  actions: <Widget>[
-                    TextButton(
-                      child: Text('CANCEL'),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                    TextButton(
-                      child: Text('OK'),
-                      onPressed: () {},
-                    ),
-                  ],
-                );
-              });
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Textpage(item: NoteHiveHelper.myNotes[index] ?? "",),
+            ),
+          );
         },
         child: Container(
           height: 100,
@@ -185,7 +199,7 @@ class Mainscreen extends StatelessWidget {
     return AppBar(
       backgroundColor: Colors.orange,
       title: const Text(
-        "Notes App ",
+        "MyNotes",
         style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 40,
@@ -203,7 +217,30 @@ class Mainscreen extends StatelessWidget {
       actions: [
         GestureDetector(
           onTap: () {
+            showDialog(context: context, builder: (context) {
+              return AlertDialog(
+                title:const Text("Do You Want to delete All Notes ?") ,
+                actions: <Widget>[
+                  TextButton(
+                    child: const Text('CANCEL'),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                  ),
+                  TextButton(
+                    child: const Text('OK'),
+                    onPressed: () {
+                      bloc.deleteallNotes ();
+                      Navigator.pop(context);
+
+
+                    },
+                  ),
+                ],
+              );
+
             bloc.deleteallNotes();
+            });
           },
           child: const Column(
             mainAxisSize: MainAxisSize.min,
@@ -216,7 +253,7 @@ class Mainscreen extends StatelessWidget {
               Icon(
                 Icons.delete_forever,
                 color: Colors.white,
-                size: 32,
+                size: 29,
               ),
             ],
           ),
